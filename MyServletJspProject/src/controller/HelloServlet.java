@@ -41,16 +41,42 @@ public class HelloServlet extends HttpServlet {
 //		out.println("<h2>현재날짜는 " + myDate + " 입니다.</h2>");
 //		out.close();
 		
+		processRequest(request, response);
+		
+		
+	}//doGet
+
+	private void processRequest(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		//request data 인코딩
+		request.setCharacterEncoding("utf-8");
+		
 		//command 문자열 추출하기
 		String cmd = request.getParameter("cmd");
 		if(cmd.equals("user_list")) {
 			getUsers(request, response);	
 		}else if(cmd.equals("user_form")) {
+			//등록하는 Form 띄우는 로직
 			insertUserForm(request, response);
+		}else if(cmd.equals("user_insert")) {
+			//등록을 처리하는 로직
+			insertUser(request, response);
+			
 		}
+	}
+
+	private void insertUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		//1.request(form) data를 추출해서 UserVO 객체에 저장
+		String userid = request.getParameter("userid");
+		String name = request.getParameter("name");
+		String gender = request.getParameter("gender");
+		String city = request.getParameter("city");
+		UserVO user = new UserVO(userid, name, gender.charAt(0), city);
 		
+		userDAO.insertUser(user);
 		
-	}//doGet
+		getUsers(request, response);
+	}
 
 	private void insertUserForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		List<String> cityList = Arrays.asList("서울", "경기", "부산", "대구", "제주");
@@ -78,7 +104,7 @@ public class HelloServlet extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
+		processRequest(request, response);
 	}
 	
 	@Override

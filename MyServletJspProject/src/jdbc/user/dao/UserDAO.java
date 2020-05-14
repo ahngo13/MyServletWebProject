@@ -74,6 +74,44 @@ public class UserDAO {
 		return updateCnt;
 	}
 	
+	//insert 하는 메서드
+	public int insertUser(UserVO user) {
+		String sql = "insert into users values(?, ?, ?, ?)";
+		Connection con = null;
+		PreparedStatement stmt = null;
+		int updateCnt = 0;
+		try {
+			con = getConnection();
+			//auto commit 해제 (default)
+			con.setAutoCommit(false);
+			stmt = con.prepareStatement(sql);
+			stmt.setString(1, user.getUserid());
+			stmt.setString(2, user.getName());
+			stmt.setString(3, Character.toString(user.getGender()));
+			stmt.setString(4, user.getCity());
+			updateCnt = stmt.executeUpdate();
+			//커밋
+			con.commit(); //수동으로 commit
+		}catch(SQLException e) {
+			//롤백
+			try {
+				con.rollback();
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		}finally {
+			try {
+				close(stmt,con);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return updateCnt;
+	}
+	
 	//userid를 입력 받아서 1개의 row를 반환하는 메서드
 	public UserVO getUser(String userid) {
 		String sql = "select * from users where userid = ?";
